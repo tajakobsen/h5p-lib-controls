@@ -1,7 +1,11 @@
 var path = require('path');
+var WebpackAutoInject = require('webpack-auto-inject-version');
 
 module.exports = {
   entry: "./src/entries/dist.js",
+  plugins: [
+    new WebpackAutoInject()
+  ],
   output: {
     path: path.join(__dirname, '/dist'),
     filename: "controls.js"

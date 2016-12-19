@@ -39,16 +39,20 @@ export default class Drag {
   /**
    * Handle grabbing objects
    *
-   * @param element
-   * @param oldElement
+   * @param {HTMLElement} element
+   * @param {HTMLElement} oldElement
    */
   select({element, oldElement}) {
+    const grabbed = element.getAttribute('aria-grabbed') === 'true';
+    element.setAttribute('aria-grabbed', grabbed ? 'false' : 'true');
+    /*
     // ungrabs the currently grabbed element
     this.unGrabElement(oldElement);
 
     // don't reselect same element
     if(element !== oldElement){
+      console.log('do grab');
       this.grabElement(element);
-    }
+    }*/
   }
 }

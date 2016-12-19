@@ -1,5 +1,5 @@
 import {setAttribute} from '../utils/elements';
-import {forEach} from '../utils/functional';
+import {curry, forEach} from '../utils/functional';
 
 export default class Drop {
   /**
