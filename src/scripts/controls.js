@@ -11,6 +11,11 @@ import Events from './utils/events';
  * @property {HTMLElement} oldElement
  */
 /**
+ * Add element event
+ * @event Controls#addElement
+ * @type ControlsEvent
+ */
+/**
  * Previous element event
  * @event Controls#previousElement
  * @type ControlsEvent
@@ -70,6 +75,7 @@ export default class Controls extends Events {
    *
    * @param {HTMLElement} el
    *
+   * @fires Controls#addElement
    * @public
    */
   addElement(el) {
