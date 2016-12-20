@@ -12,10 +12,16 @@ export default class Drop {
      * @type {Controls}
      */
     this.controls = controls;
+
+    /**
+     * @type {Array}
+     */
+    this.dragDropMapping = [];
+
     /**
      * @property {function} setDropEffectNone
      */
-    this.setDropEffectNone = setAttribute('aria-dropeffect', Drop.DropEffects.NONE);
+    this.setDropEffectNone = setAttribute('aria-dropeffect', Drop.DropEffect.NONE);
     /**
      * @property {function} setAriaDropEffectForAll
      */
@@ -27,16 +33,32 @@ export default class Drop {
     this.controls.on('addElement', this.addElement, this);
 
     // handle remove drop effect when selected
-    this.controls.on('select', this.setAriaDropEffectForAll(Drop.DropEffects.NONE), this);
+    this.controls.on('select', this.setAriaDropEffectForAll(Drop.DropEffect.NONE), this);
   };
 
   /**
    * Sets element to be droppable
    *
    * @param {HTMLElement} element
+   *
+   * @private
    */
   addElement({element}) {
     this.setDropEffectNone(element);
+  }
+
+  /**
+   * Apply drop effect where filter returns true
+   *
+   * @param {Drop.DropEffect} dropEffect
+   * @param {function} [filter]
+   * @param {*} [scope]
+   */
+  applyDropEffectWhere(dropEffect, filter, scope){
+    filter = filter || (el => true);
+    this.controls.elements
+      .filter(filter, scope)
+      .forEach(setAttribute('aria-dropeffect', dropEffect))
   }
 }
 
@@ -45,7 +67,10 @@ export default class Drop {
  * @readonly
  * @enum {string}
  */
-Drop.DropEffects = {
-  NONE: 'none',
-  MOVE: 'move'
+Drop.DropEffect = {
+  COPY: 'copy',
+  MOVE: 'move',
+  EXECUTE: 'execute',
+  POPUP: 'popup',
+  NONE: 'none'
 };

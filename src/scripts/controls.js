@@ -30,6 +30,11 @@ import Events from './utils/events';
  * @event Controls#select
  * @type ControlsEvent
  */
+/**
+ * Drag element event
+ * @event Controls#drag
+ * @type ControlsEvent
+ */
 
 /**
  * @class
@@ -92,7 +97,7 @@ export default class Controls extends Events {
    * Fire event
    *
    * @param {string} type
-   * @param {HTMLElement} el
+   * @param {HTMLElement|EventTarget} el
    *
    * @public
    */
