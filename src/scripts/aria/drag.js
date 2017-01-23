@@ -1,5 +1,38 @@
-import {setAttribute} from '../utils/elements';
+import {setAttribute, attributeEquals, hasAttribute} from '../utils/elements';
+import {compose, filter, some} from '../utils/functional';
 
+/**
+ * @type {string}
+ * @readonly
+ */
+const ATTRIBUTE_ARIA_GRABBED = 'aria-grabbed';
+
+/**
+ * @type {function} setGrabbedTrue
+ * @param {HTMLElement} element
+ */
+const setGrabbed = setAttribute(ATTRIBUTE_ARIA_GRABBED);
+
+/**
+ * @type {function} isGrabbed
+ * @param {HTMLElement} element
+ */
+const isGrabbed = attributeEquals(ATTRIBUTE_ARIA_GRABBED, 'true');
+
+/**
+ * @type {function} filterHasAttributeDropEffect
+ */
+const filterHasAttributeGrabbed = filter(hasAttribute(ATTRIBUTE_ARIA_GRABBED));
+
+/**
+ * @type {function} hasGrabbed
+ * @param {HTMLElement[]} elements
+ */
+const hasGrabbed = compose(some(isGrabbed), filterHasAttributeGrabbed);
+
+/**
+ * @class
+ */
 export default class Drag {
   /**
    * Inits this class
@@ -11,48 +44,36 @@ export default class Drag {
      * @type {Controls}
      */
     this.controls = controls;
-    /**
-     * @property {function} grabElement
-     */
-    this.grabElement = setAttribute('aria-grabbed', 'true');
-    /**
-     * @property {function} unGrabElement
-     */
-    this.unGrabElement = setAttribute('aria-grabbed', 'false');
-
-    // handle add element event
-    this.controls.on('addElement', this.addElement, this);
 
     // handle select event
     this.controls.on('select', this.select, this);
   };
 
   /**
-   * Marks element as grabbable (but not grabbed)
+   * Marks element as aria-grabbed = 'false' and adds to controller
    *
    * @param element
    */
-  addElement({element}) {
-    this.unGrabElement(element);
+  addElement(element) {
+    setGrabbed('false', element);
+    this.controls.addElement(element);
+  }
+
+  /**
+   * Returns true if any of the elements are grabbed
+   *
+   * @return {boolean}
+   */
+  hasAnyGrabbed(){
+    return hasGrabbed(this.controls.elements)
   }
 
   /**
    * Handle grabbing objects
    *
    * @param {HTMLElement} element
-   * @param {HTMLElement} oldElement
    */
-  select({element, oldElement}) {
-    const grabbed = element.getAttribute('aria-grabbed') === 'true';
-    element.setAttribute('aria-grabbed', grabbed ? 'false' : 'true');
-    /*
-    // ungrabs the currently grabbed element
-    this.unGrabElement(oldElement);
-
-    // don't reselect same element
-    if(element !== oldElement){
-      console.log('do grab');
-      this.grabElement(element);
-    }*/
+  select({element}) {
+    setGrabbed((!isGrabbed(element)).toString(), element);
   }
 }

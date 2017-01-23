@@ -88,7 +88,7 @@ export default class Controls extends Events {
 
     this.firesEvent('addElement', el);
 
-    if(this.elements.length === 1){ // if first
+    if (this.elements.length === 1) { // if first
       this.setTabbable(el);
     }
   };

@@ -1,10 +1,49 @@
-import {setAttribute} from '../utils/elements';
-import {curry, forEach} from '../utils/functional';
+import {setAttribute, hasAttribute} from '../utils/elements';
+import {compose, forEach, filter} from '../utils/functional';
 
+/**
+ * @type {string}
+ * @readonly
+ */
+const ATTRIBUTE_ARIA_DROPEFFECT = 'aria-dropeffect';
+
+/**
+ * @type {function} setDropEffectNone
+ */
+const setDropEffectNone = setAttribute(ATTRIBUTE_ARIA_DROPEFFECT, 'none');
+
+/**
+ * @type {function} setDropEffectNone
+ */
+const setDropEffectMove = setAttribute(ATTRIBUTE_ARIA_DROPEFFECT, 'move');
+
+/**
+ * @type {function} filterHasAttributeDropEffect
+ */
+const filterHasAttributeDropEffect = filter(hasAttribute(ATTRIBUTE_ARIA_DROPEFFECT));
+
+/**
+ * Sets all drop zones to move
+ * @param {HTMLElement[]} elements
+ * @type {function} setDropZoneEffectsToMove
+ */
+const setAllDropEffectsToMove = compose(forEach(setDropEffectMove), filterHasAttributeDropEffect);
+
+/**
+ * Sets all drop zones to none
+ * @param {HTMLElement[]} elements
+ * @type {function} setAllDropEffectsToNone
+ */
+const setAllDropEffectsToNone = compose(forEach(setDropEffectNone), filterHasAttributeDropEffect);
+
+/**
+ * Class for handling Drop Zones
+ *
+ * @class
+ */
 export default class Drop {
   /**
    * Inits this class
-   *
    * @param {Controls} controls
    */
   init(controls) {
@@ -12,53 +51,22 @@ export default class Drop {
      * @type {Controls}
      */
     this.controls = controls;
-
-    /**
-     * @type {Array}
-     */
-    this.dragDropMapping = [];
-
-    /**
-     * @property {function} setDropEffectNone
-     */
-    this.setDropEffectNone = setAttribute('aria-dropeffect', Drop.DropEffect.NONE);
-    /**
-     * @property {function} setAriaDropEffectForAll
-     */
-    this.setAriaDropEffectForAll = curry(function(dropEffect, {elements}){
-      forEach(setAttribute('aria-dropeffect', dropEffect), elements);
-    });
-
-    // handle add element event
-    this.controls.on('addElement', this.addElement, this);
-
-    // handle remove drop effect when selected
-    this.controls.on('select', this.setAriaDropEffectForAll(Drop.DropEffect.NONE), this);
   };
 
   /**
-   * Sets element to be droppable
-   *
-   * @param {HTMLElement} element
-   *
-   * @private
+   * On elements with aria-dropeffect, set aria-dropeffect to 'move'
+   * @public
    */
-  addElement({element}) {
-    this.setDropEffectNone(element);
+  setAllToMove() {
+    setAllDropEffectsToMove(this.controls.elements);
   }
 
   /**
-   * Apply drop effect where filter returns true
-   *
-   * @param {Drop.DropEffect} dropEffect
-   * @param {function} [filter]
-   * @param {*} [scope]
+   * On elements with aria-dropeffect, set aria-dropeffect to 'none'
+   * @public
    */
-  applyDropEffectWhere(dropEffect, filter, scope){
-    filter = filter || (el => true);
-    this.controls.elements
-      .filter(filter, scope)
-      .forEach(setAttribute('aria-dropeffect', dropEffect))
+  setAllToNone() {
+    setAllDropEffectsToNone(this.controls.elements);
   }
 }
 

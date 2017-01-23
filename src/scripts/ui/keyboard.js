@@ -88,7 +88,10 @@ export default class Keyboard {
    */
   select(el){
     if(this.selectability) {
-      this.controls.firesEvent('select', el)
+      if(this.controls.firesEvent('before-select', el) !== false) {
+        this.controls.firesEvent('select', el);
+        this.controls.firesEvent('after-select', el)
+      }
     }
   };
 

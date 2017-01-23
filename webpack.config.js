@@ -3,6 +3,7 @@ var WebpackAutoInject = require('webpack-auto-inject-version');
 
 module.exports = {
   entry: "./src/entries/dist.js",
+  devtool:  'source-map',
   plugins: [
     new WebpackAutoInject()
   ],

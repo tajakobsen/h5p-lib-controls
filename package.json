@@ -1,5 +1,5 @@
 {
-  "name": "h5pLibControls",
+  "name": "h5p-lib-controls",
   "version": "1.0.0",
   "description": "Add keyboard support for ARIA for h5ps",
   "scripts": {

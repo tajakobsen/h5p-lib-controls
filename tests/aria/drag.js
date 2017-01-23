@@ -2,22 +2,22 @@ import Controls from '../../src/scripts/controls';
 import Keyboard from '../../src/scripts/ui/keyboard';
 import Drag from '../../src/scripts/aria/drag';
 
-describe("Controls", function () {
+describe("Aria Drag", function () {
   let controls,
     keyboard,
     elements,
-    drag;
+    ariaDrag;
 
   beforeEach(function () {
-    drag = new Drag();
+    ariaDrag = new Drag();
     keyboard = new Keyboard();
-    controls = new Controls([keyboard, drag]);
+    controls = new Controls([keyboard, ariaDrag]);
     elements = [document.createElement("div"), document.createElement("div"), document.createElement("div")];
   });
 
   it("should add elements correctly", function () {
-    // add elements to controls
-    elements.forEach(el => controls.addElement(el));
+    // add elements to controls via ariaDrag, to get aria-grabbed set
+    elements.forEach(el => ariaDrag.addElement(el));
 
     // needs aria-grabbed attribute to indicate grabability
     expect(elements[0].hasAttribute('aria-grabbed')).toBeTruthy();
@@ -27,7 +27,7 @@ describe("Controls", function () {
 
   it("should indicate grabbed", function () {
     // add elements to controls
-    elements.forEach(el => controls.addElement(el));
+    elements.forEach(el => ariaDrag.addElement(el));
 
     // select element 1
     controls.firesEvent('select', elements[1]);
