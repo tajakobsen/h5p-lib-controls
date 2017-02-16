@@ -88,6 +88,7 @@ export default class Drag {
    * @param {HTMLElement} element
    */
   select({element}) {
+    console.log('Drag on select');
     const alreadyGrabbed = isGrabbed(element);
 
     this.setAllGrabbedToFalse();

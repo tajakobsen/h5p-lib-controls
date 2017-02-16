@@ -42,6 +42,23 @@ import Events from './utils/events';
  */
 
 /**
+ * @type {function} removeTabIndex
+ */
+const removeTabIndex = removeAttribute('tabindex');
+/**
+ * @type {function} removeTabIndexForAll
+ */
+const removeTabIndexForAll = forEach(removeTabIndex);
+/**
+ * @type {function} setTabIndexZero
+ */
+const setTabIndexZero = setAttribute('tabindex', '0');
+/**
+ * @type {function} hasTabIndex
+ */
+const hasTabIndex = hasAttribute('tabindex');
+
+/**
  * @class
  */
 export default class Controls extends Events {
@@ -60,23 +77,6 @@ export default class Controls extends Events {
      * @property {HTMLElement[]} elements
      */
     this.elements = [];
-    /**
-     * @property {function} removeTabIndex
-     */
-    this.removeTabIndex = removeAttribute('tabindex');
-    /**
-     * @property {function} removeTabIndexForAll
-     */
-    this.removeTabIndexForAll = forEach(this.removeTabIndex);
-    /**
-     * @property {function} setTabIndexZero
-     */
-    this.setTabIndexZero = setAttribute('tabindex', '0');
-    /**
-     * @property {function} hasTabIndex
-     */
-    this.hasTabIndex = hasAttribute('tabindex');
-
 
     // move tabindex to next element
     this.on('nextElement', this.nextElement, this);
@@ -117,15 +117,18 @@ export default class Controls extends Events {
   removeElement(el) {
     this.elements = without([el], this.elements);
 
-    // if removed element was selected, set first element selected
-    if(this.hasTabIndex(el) && this.elements[0]) {
-      this.removeTabIndex(el);
-      this.setTabbable(this.elements[0]);
+    // if removed element was selected
+    if(hasTabIndex(el)) {
+      removeTabIndex(el);
+
+      // set first element selected if exists
+      if(this.elements[0]) {
+        this.setTabbable(this.elements[0]);
+      }
     }
 
     this.firesEvent('removeElement', el);
   };
-
 
   /**
    * Fire event
@@ -164,6 +167,18 @@ export default class Controls extends Events {
   /**
    * Sets tabindex on an element, remove it from all others
    *
+   * @param {HTMLElement} el
+   * @public
+   */
+  setTabbable(el) {
+    removeTabIndexForAll(this.elements);
+    setTabIndexZero(el);
+    this.tabbableElement = el;
+  }
+
+  /**
+   * Sets tabindex on an element, remove it from all others
+   *
    * @param {number} index
    *
    * @private
@@ -174,18 +189,6 @@ export default class Controls extends Events {
 
     this.setTabbable(prevEl);
     prevEl.focus();
-  }
-
-  /**
-   * Sets tabindex on an element, remove it from all others
-   *
-   * @param {HTMLElement} el
-   * @private
-   */
-  setTabbable(el) {
-    this.removeTabIndexForAll(this.elements);
-    this.setTabIndexZero(el);
-    this.tabbableElement = el;
   }
 
   /**

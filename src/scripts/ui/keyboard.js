@@ -17,10 +17,18 @@ export default class Keyboard {
    */
   init(controls) {
     /**
+     * Need to have a common binding of handleKeyDown, so that it can be a
+     * common instance to be used for addEventListener and removeEventListener
+     * @type {function}
+     */
+    this.boundHandleKeyDown = this.handleKeyDown.bind(this);
+
+    /**
      * @type {Controls}
      */
     this.controls = controls;
     this.controls.on('addElement', this.listenForKeyDown, this);
+    this.controls.on('removeElement', this.removeKeyDownListener, this);
   };
 
   /**
@@ -30,7 +38,17 @@ export default class Keyboard {
    * @private
    */
   listenForKeyDown({element}) {
-    element.addEventListener('keydown', this.handleKeyDown.bind(this));
+    element.addEventListener('keydown', this.boundHandleKeyDown);
+  };
+
+  /**
+   * Remove a keyboard press listener
+   *
+   * @param {HTMLElement} element
+   * @private
+   */
+  removeKeyDownListener({element}) {
+    element.removeEventListener('keydown', this.boundHandleKeyDown);
   };
 
   /**
@@ -39,7 +57,7 @@ export default class Keyboard {
    * @param {KeyboardEvent} event Keyboard event
    * @private
    */
-  handleKeyDown(event){
+  handleKeyDown(event) {
     switch (event.which) {
       case 13: // Enter
       case 32: // Space

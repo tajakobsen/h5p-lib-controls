@@ -123,8 +123,26 @@
 	 */
 	
 	/**
+	 * @type {function} removeTabIndex
+	 */
+	var removeTabIndex = (0, _elements.removeAttribute)('tabindex');
+	/**
+	 * @type {function} removeTabIndexForAll
+	 */
+	var removeTabIndexForAll = (0, _functional.forEach)(removeTabIndex);
+	/**
+	 * @type {function} setTabIndexZero
+	 */
+	var setTabIndexZero = (0, _elements.setAttribute)('tabindex', '0');
+	/**
+	 * @type {function} hasTabIndex
+	 */
+	var hasTabIndex = (0, _elements.hasAttribute)('tabindex');
+	
+	/**
 	 * @class
 	 */
+	
 	var Controls = function (_Events) {
 	  _inherits(Controls, _Events);
 	
@@ -145,22 +163,6 @@
 	     * @property {HTMLElement[]} elements
 	     */
 	    _this.elements = [];
-	    /**
-	     * @property {function} removeTabIndex
-	     */
-	    _this.removeTabIndex = (0, _elements.removeAttribute)('tabindex');
-	    /**
-	     * @property {function} removeTabIndexForAll
-	     */
-	    _this.removeTabIndexForAll = (0, _functional.forEach)(_this.removeTabIndex);
-	    /**
-	     * @property {function} setTabIndexZero
-	     */
-	    _this.setTabIndexZero = (0, _elements.setAttribute)('tabindex', '0');
-	    /**
-	     * @property {function} hasTabIndex
-	     */
-	    _this.hasTabIndex = (0, _elements.hasAttribute)('tabindex');
 	
 	    // move tabindex to next element
 	    _this.on('nextElement', _this.nextElement, _this);
@@ -210,10 +212,14 @@
 	    value: function removeElement(el) {
 	      this.elements = (0, _functional.without)([el], this.elements);
 	
-	      // if removed element was selected, set first element selected
-	      if (this.hasTabIndex(el) && this.elements[0]) {
-	        this.removeTabIndex(el);
-	        this.setTabbable(this.elements[0]);
+	      // if removed element was selected
+	      if (hasTabIndex(el)) {
+	        removeTabIndex(el);
+	
+	        // set first element selected if exists
+	        if (this.elements[0]) {
+	          this.setTabbable(this.elements[0]);
+	        }
 	      }
 	
 	      this.firesEvent('removeElement', el);
@@ -264,6 +270,21 @@
 	    /**
 	     * Sets tabindex on an element, remove it from all others
 	     *
+	     * @param {HTMLElement} el
+	     * @public
+	     */
+	
+	  }, {
+	    key: 'setTabbable',
+	    value: function setTabbable(el) {
+	      removeTabIndexForAll(this.elements);
+	      setTabIndexZero(el);
+	      this.tabbableElement = el;
+	    }
+	
+	    /**
+	     * Sets tabindex on an element, remove it from all others
+	     *
 	     * @param {number} index
 	     *
 	     * @private
@@ -279,21 +300,6 @@
 	
 	      this.setTabbable(prevEl);
 	      prevEl.focus();
-	    }
-	
-	    /**
-	     * Sets tabindex on an element, remove it from all others
-	     *
-	     * @param {HTMLElement} el
-	     * @private
-	     */
-	
-	  }, {
-	    key: 'setTabbable',
-	    value: function setTabbable(el) {
-	      this.removeTabIndexForAll(this.elements);
-	      this.setTabIndexZero(el);
-	      this.tabbableElement = el;
 	    }
 	
 	    /**
@@ -659,10 +665,18 @@
 	    key: 'init',
 	    value: function init(controls) {
 	      /**
+	       * Need to have a common binding of handleKeyDown, so that it can be a
+	       * common instance to be used for addEventListener and removeEventListener
+	       * @type {function}
+	       */
+	      this.boundHandleKeyDown = this.handleKeyDown.bind(this);
+	
+	      /**
 	       * @type {Controls}
 	       */
 	      this.controls = controls;
 	      this.controls.on('addElement', this.listenForKeyDown, this);
+	      this.controls.on('removeElement', this.removeKeyDownListener, this);
 	    }
 	  }, {
 	    key: 'listenForKeyDown',
@@ -677,7 +691,22 @@
 	    value: function listenForKeyDown(_ref) {
 	      var element = _ref.element;
 	
-	      element.addEventListener('keydown', this.handleKeyDown.bind(this));
+	      element.addEventListener('keydown', this.boundHandleKeyDown);
+	    }
+	  }, {
+	    key: 'removeKeyDownListener',
+	
+	
+	    /**
+	     * Remove a keyboard press listener
+	     *
+	     * @param {HTMLElement} element
+	     * @private
+	     */
+	    value: function removeKeyDownListener(_ref2) {
+	      var element = _ref2.element;
+	
+	      element.removeEventListener('keydown', this.boundHandleKeyDown);
 	    }
 	  }, {
 	    key: 'handleKeyDown',
@@ -1031,6 +1060,7 @@
 	    value: function select(_ref) {
 	      var element = _ref.element;
 	
+	      console.log('Drag on select');
 	      var alreadyGrabbed = isGrabbed(element);
 	
 	      this.setAllGrabbedToFalse();
