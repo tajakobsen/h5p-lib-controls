@@ -97,6 +97,11 @@
 	 * @type ControlsEvent
 	 */
 	/**
+	 * Remove element event
+	 * @event Controls#removeElement
+	 * @type ControlsEvent
+	 */
+	/**
 	 * Previous element event
 	 * @event Controls#previousElement
 	 * @type ControlsEvent
@@ -140,15 +145,22 @@
 	     * @property {HTMLElement[]} elements
 	     */
 	    _this.elements = [];
-	
+	    /**
+	     * @property {function} removeTabIndex
+	     */
+	    _this.removeTabIndex = (0, _elements.removeAttribute)('tabindex');
 	    /**
 	     * @property {function} removeTabIndexForAll
 	     */
-	    _this.removeTabIndexForAll = (0, _functional.forEach)((0, _elements.removeAttribute)('tabindex'));
+	    _this.removeTabIndexForAll = (0, _functional.forEach)(_this.removeTabIndex);
 	    /**
 	     * @property {function} setTabIndexZero
 	     */
 	    _this.setTabIndexZero = (0, _elements.setAttribute)('tabindex', '0');
+	    /**
+	     * @property {function} hasTabIndex
+	     */
+	    _this.hasTabIndex = (0, _elements.hasAttribute)('tabindex');
 	
 	    // move tabindex to next element
 	    _this.on('nextElement', _this.nextElement, _this);
@@ -182,6 +194,29 @@
 	        // if first
 	        this.setTabbable(el);
 	      }
+	    }
+	  }, {
+	    key: 'removeElement',
+	
+	
+	    /**
+	     * Add controls to an element
+	     *
+	     * @param {HTMLElement} el
+	     *
+	     * @fires Controls#addElement
+	     * @public
+	     */
+	    value: function removeElement(el) {
+	      this.elements = (0, _functional.without)([el], this.elements);
+	
+	      // if removed element was selected, set first element selected
+	      if (this.hasTabIndex(el) && this.elements[0]) {
+	        this.removeTabIndex(el);
+	        this.setTabbable(this.elements[0]);
+	      }
+	
+	      this.firesEvent('removeElement', el);
 	    }
 	  }, {
 	    key: 'firesEvent',
@@ -382,21 +417,14 @@
 	var curry = exports.curry = function curry(fn) {
 	  var arity = fn.length;
 	
-	  return function () {
-	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-	      args[_key] = arguments[_key];
-	    }
-	
-	    var firstArgs = args.length;
-	    if (firstArgs >= arity) {
-	      return fn.apply(undefined, args);
+	  return function f1() {
+	    var args = Array.prototype.slice.call(arguments, 0);
+	    if (args.length >= arity) {
+	      return fn.apply(null, args);
 	    } else {
-	      return function () {
-	        for (var _len2 = arguments.length, secondArgs = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-	          secondArgs[_key2] = arguments[_key2];
-	        }
-	
-	        return fn.apply(undefined, [].concat(args, secondArgs));
+	      return function f2() {
+	        var args2 = Array.prototype.slice.call(arguments, 0);
+	        return f1.apply(null, args.concat(args2));
 	      };
 	    }
 	  };
@@ -413,8 +441,8 @@
 	 * @return {function}
 	 */
 	var compose = exports.compose = function compose() {
-	  for (var _len3 = arguments.length, fns = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-	    fns[_key3] = arguments[_key3];
+	  for (var _len = arguments.length, fns = Array(_len), _key = 0; _key < _len; _key++) {
+	    fns[_key] = arguments[_key];
 	  }
 	
 	  return fns.reduce(function (f, g) {
@@ -482,6 +510,38 @@
 	 */
 	var some = exports.some = curry(function (fn, arr) {
 	  return arr.some(fn);
+	});
+	
+	/**
+	 * Returns true if an array contains a value
+	 *
+	 * @param {*} value
+	 * @param {Array} arr
+	 *
+	 * @function
+	 * @public
+	 *
+	 * @return {function}
+	 */
+	var contains = exports.contains = curry(function (value, arr) {
+	  return arr.indexOf(value) != -1;
+	});
+	
+	/**
+	 * Returns an array without the supplied values
+	 *
+	 * @param {Array} values
+	 * @param {Array} arr
+	 *
+	 * @function
+	 * @public
+	 *
+	 * @return {function}
+	 */
+	var without = exports.without = curry(function (values, arr) {
+	  return filter(function (value) {
+	    return !contains(value, values);
+	  }, arr);
 	});
 
 /***/ },
@@ -690,7 +750,10 @@
 	     */
 	    value: function select(el) {
 	      if (this.selectability) {
-	        this.controls.firesEvent('select', el);
+	        if (this.controls.firesEvent('before-select', el) !== false) {
+	          this.controls.firesEvent('select', el);
+	          this.controls.firesEvent('after-select', el);
+	        }
 	      }
 	    }
 	  }, {
@@ -883,6 +946,13 @@
 	var filterHasAttributeGrabbed = (0, _functional.filter)((0, _elements.hasAttribute)(ATTRIBUTE_ARIA_GRABBED));
 	
 	/**
+	 * Sets all aria-grabbed to 'false'
+	 * @param {HTMLElement[]} elements
+	 * @type {function} setAllGrabbedToFalse
+	 */
+	var _setAllGrabbedToFalse = (0, _functional.compose)((0, _functional.forEach)((0, _elements.setAttribute)(ATTRIBUTE_ARIA_GRABBED, 'false')), filterHasAttributeGrabbed);
+	
+	/**
 	 * @type {function} hasGrabbed
 	 * @param {HTMLElement[]} elements
 	 */
@@ -929,6 +999,16 @@
 	    }
 	
 	    /**
+	     * Sets aria-grabbed to 'false' for all elements that has it
+	     */
+	
+	  }, {
+	    key: 'setAllGrabbedToFalse',
+	    value: function setAllGrabbedToFalse() {
+	      _setAllGrabbedToFalse(this.controls.elements);
+	    }
+	
+	    /**
 	     * Returns true if any of the elements are grabbed
 	     *
 	     * @return {boolean}
@@ -941,7 +1021,7 @@
 	    }
 	
 	    /**
-	     * Handle grabbing objects
+	     * Un selects all, but selects new element if not already selected
 	     *
 	     * @param {HTMLElement} element
 	     */
@@ -951,7 +1031,13 @@
 	    value: function select(_ref) {
 	      var element = _ref.element;
 	
-	      setGrabbed((!isGrabbed(element)).toString(), element);
+	      var alreadyGrabbed = isGrabbed(element);
+	
+	      this.setAllGrabbedToFalse();
+	
+	      if (!alreadyGrabbed) {
+	        setGrabbed('true', element);
+	      }
 	    }
 	  }]);
 	

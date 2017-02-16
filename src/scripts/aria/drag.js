@@ -1,5 +1,5 @@
-import {setAttribute, attributeEquals, hasAttribute} from '../utils/elements';
-import {compose, filter, some} from '../utils/functional';
+import {attributeEquals, hasAttribute, setAttribute} from '../utils/elements';
+import {compose, forEach, filter, some, curry} from '../utils/functional';
 
 /**
  * @type {string}
@@ -23,6 +23,13 @@ const isGrabbed = attributeEquals(ATTRIBUTE_ARIA_GRABBED, 'true');
  * @type {function} filterHasAttributeDropEffect
  */
 const filterHasAttributeGrabbed = filter(hasAttribute(ATTRIBUTE_ARIA_GRABBED));
+
+/**
+ * Sets all aria-grabbed to 'false'
+ * @param {HTMLElement[]} elements
+ * @type {function} setAllGrabbedToFalse
+ */
+const setAllGrabbedToFalse = compose(forEach(setAttribute(ATTRIBUTE_ARIA_GRABBED, 'false')), filterHasAttributeGrabbed);
 
 /**
  * @type {function} hasGrabbed
@@ -60,20 +67,33 @@ export default class Drag {
   }
 
   /**
+   * Sets aria-grabbed to 'false' for all elements that has it
+   */
+  setAllGrabbedToFalse() {
+    setAllGrabbedToFalse(this.controls.elements);
+  }
+
+  /**
    * Returns true if any of the elements are grabbed
    *
    * @return {boolean}
    */
-  hasAnyGrabbed(){
+  hasAnyGrabbed() {
     return hasGrabbed(this.controls.elements)
   }
 
   /**
-   * Handle grabbing objects
+   * Un selects all, but selects new element if not already selected
    *
    * @param {HTMLElement} element
    */
   select({element}) {
-    setGrabbed((!isGrabbed(element)).toString(), element);
+    const alreadyGrabbed = isGrabbed(element);
+
+    this.setAllGrabbedToFalse();
+
+    if(!alreadyGrabbed) {
+      setGrabbed('true', element);
+    }
   }
 }

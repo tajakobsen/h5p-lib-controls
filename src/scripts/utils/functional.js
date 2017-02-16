@@ -7,19 +7,21 @@
  *
  * @return {function}
  */
-export const curry = fn => {
-  let arity = fn.length;
+export const curry = function(fn) {
+  const arity = fn.length;
 
-  return (...args) => {
-    let firstArgs = args.length;
-    if (firstArgs >= arity) {
-      return fn(...args);
-    } else {
-      return (...secondArgs) => {
-        return fn(...[...args, ...secondArgs]);
+  return function f1() {
+    const args = Array.prototype.slice.call(arguments, 0);
+    if (args.length >= arity) {
+      return fn.apply(null, args);
+    }
+    else {
+      return function f2() {
+        const args2 = Array.prototype.slice.call(arguments, 0);
+        return f1.apply(null, args.concat(args2));
       }
     }
-  }
+  };
 };
 
 /**
@@ -92,4 +94,34 @@ export const filter = curry(function (fn, arr) {
  */
 export const some = curry(function (fn, arr) {
   return arr.some(fn);
+});
+
+/**
+ * Returns true if an array contains a value
+ *
+ * @param {*} value
+ * @param {Array} arr
+ *
+ * @function
+ * @public
+ *
+ * @return {function}
+ */
+export const contains = curry(function (value, arr) {
+  return arr.indexOf(value) != -1;
+});
+
+/**
+ * Returns an array without the supplied values
+ *
+ * @param {Array} values
+ * @param {Array} arr
+ *
+ * @function
+ * @public
+ *
+ * @return {function}
+ */
+export const without = curry(function (values, arr) {
+  return filter(value => !contains(value, values), arr)
 });

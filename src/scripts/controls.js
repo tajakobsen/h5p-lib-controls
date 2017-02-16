@@ -1,5 +1,5 @@
-import {removeAttribute, setAttribute} from './utils/elements';
-import {forEach} from './utils/functional';
+import {setAttribute, removeAttribute, hasAttribute} from './utils/elements';
+import {forEach, without} from './utils/functional';
 import Events from './utils/events';
 
 /**
@@ -13,6 +13,11 @@ import Events from './utils/events';
 /**
  * Add element event
  * @event Controls#addElement
+ * @type ControlsEvent
+ */
+/**
+ * Remove element event
+ * @event Controls#removeElement
  * @type ControlsEvent
  */
 /**
@@ -55,15 +60,23 @@ export default class Controls extends Events {
      * @property {HTMLElement[]} elements
      */
     this.elements = [];
-
+    /**
+     * @property {function} removeTabIndex
+     */
+    this.removeTabIndex = removeAttribute('tabindex');
     /**
      * @property {function} removeTabIndexForAll
      */
-    this.removeTabIndexForAll = forEach(removeAttribute('tabindex'));
+    this.removeTabIndexForAll = forEach(this.removeTabIndex);
     /**
      * @property {function} setTabIndexZero
      */
     this.setTabIndexZero = setAttribute('tabindex', '0');
+    /**
+     * @property {function} hasTabIndex
+     */
+    this.hasTabIndex = hasAttribute('tabindex');
+
 
     // move tabindex to next element
     this.on('nextElement', this.nextElement, this);
@@ -92,6 +105,27 @@ export default class Controls extends Events {
       this.setTabbable(el);
     }
   };
+
+  /**
+   * Add controls to an element
+   *
+   * @param {HTMLElement} el
+   *
+   * @fires Controls#addElement
+   * @public
+   */
+  removeElement(el) {
+    this.elements = without([el], this.elements);
+
+    // if removed element was selected, set first element selected
+    if(this.hasTabIndex(el) && this.elements[0]) {
+      this.removeTabIndex(el);
+      this.setTabbable(this.elements[0]);
+    }
+
+    this.firesEvent('removeElement', el);
+  };
+
 
   /**
    * Fire event

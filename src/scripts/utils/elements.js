@@ -9,7 +9,7 @@ import {curry} from './functional'
  * @function
  * @return {string}
  */
-export const getAttribute = curry(function (name, el){
+export const getAttribute = curry(function (name, el) {
   return el.getAttribute(name);
 });
 
@@ -22,7 +22,7 @@ export const getAttribute = curry(function (name, el){
  *
  * @function
  */
-export const setAttribute = curry(function (name, value, el){
+export const setAttribute = curry(function (name, value, el) {
   el.setAttribute(name, value);
 });
 
@@ -34,7 +34,7 @@ export const setAttribute = curry(function (name, value, el){
  *
  * @function
  */
-export const removeAttribute = curry(function (name, el){
+export const removeAttribute = curry(function (name, el) {
   el.removeAttribute(name);
 });
 
@@ -47,7 +47,7 @@ export const removeAttribute = curry(function (name, el){
  * @function
  * @return {boolean}
  */
-export const hasAttribute = curry(function (name, el){
+export const hasAttribute = curry(function (name, el) {
   return el.hasAttribute(name);
 });
 
@@ -61,6 +61,6 @@ export const hasAttribute = curry(function (name, el){
  * @function
  * @return {boolean}
  */
-export const attributeEquals = curry(function (name, value, el){
+export const attributeEquals = curry(function (name, value, el) {
   return el.getAttribute(name) === value;
 });
