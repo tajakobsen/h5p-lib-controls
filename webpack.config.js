@@ -1,26 +1,28 @@
-var path = require('path');
-var WebpackAutoInject = require('webpack-auto-inject-version');
+const path = require('path');
 
-module.exports = {
+const config = {
   entry: "./src/entries/dist.js",
-  devtool:  'source-map',
-  plugins: [
-    new WebpackAutoInject()
-  ],
+  devtool: 'inline-source-map',
+
   output: {
-    path: path.join(__dirname, '/dist'),
-    filename: "controls.js"
+    path: path.join(__dirname, 'dist'),
+    filename: "h5p-sdk-controls.js",
+    sourceMapFilename: '[file].map'
+  },
+  resolve: {
+    modules: [
+      path.resolve('./src'),
+      path.resolve('./node_modules/h5p-sdk/src/scripts')
+    ]
   },
   module: {
-    loaders: [
+    rules: [
       {
-        test: /\.js$/,
-        include: [
-          path.resolve(__dirname, "src/scripts"),
-          path.resolve(__dirname, "src/entries")
-        ],
-        loader: 'babel'
+        test: /\.(js|jsx)$/,
+        use: 'babel-loader'
       }
     ]
   }
 };
+
+module.exports = config;

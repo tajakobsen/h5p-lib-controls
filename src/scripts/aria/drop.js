@@ -1,5 +1,5 @@
-import {setAttribute, hasAttribute} from '../utils/elements';
-import {compose, forEach, filter} from '../utils/functional';
+import {setAttribute, hasAttribute} from 'utils/elements';
+import {compose, forEach, filter} from 'utils/functional';
 
 /**
  * @type {string}

@@ -1,6 +1,6 @@
-import {setAttribute, removeAttribute, hasAttribute} from './utils/elements';
-import {forEach, without} from './utils/functional';
-import Events from './utils/events';
+import { setAttribute, removeAttribute, hasAttribute } from 'utils/elements';
+import { forEach, without } from 'utils/functional';
+import { Eventful } from './mixins/eventful';
 
 /**
  * Controls Event
@@ -60,10 +60,12 @@ const hasTabIndex = hasAttribute('tabindex');
 
 /**
  * @class
+ * @mixes Eventful
  */
-export default class Controls extends Events {
+export default class Controls {
   constructor(plugins) {
-    super();
+    // add event system
+    Object.assign(this, Eventful());
 
     /**
      *@property {HTMLElement} tabbableElement

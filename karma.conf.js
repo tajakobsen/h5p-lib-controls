@@ -1,8 +1,7 @@
-var path = require('path');
+var webpackConfig = require('./webpack.config.js');
 
 module.exports = function(config) {
-  var configuration =
-  {
+  config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
@@ -15,7 +14,8 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'tests/**/*.js'
+      'src/scripts/**/*.js',
+      'test/**/*.js'
     ],
 
 
@@ -23,39 +23,14 @@ module.exports = function(config) {
     exclude: [
     ],
 
-
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'tests/**/*.js': ['webpack']
+      'src/scripts/**/*.js': ['webpack'],
+      'test/**/*.js': ['webpack'],
     },
-
-
-    // test results reporter to use
-    // possible values: 'dots', 'progress'
-    // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress'],
-
-    webpack: {
-      module: {
-        loaders: [
-          {
-            test: /\.js$/,
-            include: [
-              path.resolve(__dirname, "tests"),
-              path.resolve(__dirname, "src/scripts")
-            ],
-            loader: 'babel'
-          },
-          {
-            test: /\.css$/,
-            include: path.resolve(__dirname, "src/scripts"),
-            loader: "style!css"
-          }
-        ]
-      },
-    },
-
+    webpack: webpackConfig,
+    reporters: ['mocha'],
 
     // web server port
     port: 9876,
@@ -69,14 +44,21 @@ module.exports = function(config) {
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
     logLevel: config.LOG_INFO,
 
+    client: {
+      captureConsole: true,
+      browserConsoleLogOptions: true,
+      mocha: {
+        bail: true
+      }
+    },
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: false,
+    autoWatch: true,
 
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'/*, 'Firefox'*/],
+    browsers: ['Chrome'],
 
 
     // Continuous Integration mode
@@ -86,18 +68,5 @@ module.exports = function(config) {
     // Concurrency level
     // how many browser should be started simultaneous
     concurrency: Infinity
-  };
-
-  if(process.env.TRAVIS){
-    configuration.customLaunchers = {
-      Chrome_travis_ci: {
-        base: 'Chrome',
-        flags: ['--no-sandbox']
-      }
-    };
-
-    configuration.browsers = ['Chrome_travis_ci', 'Firefox'];
-  }
-
-  config.set(configuration);
+  })
 };

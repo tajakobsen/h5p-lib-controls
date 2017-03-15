@@ -6,6 +6,19 @@ H5P Editor Question Set Textual Editor
 
 Makes it fast and easy to create summary tasks through text input.
 
+## Building
+
+Get the [h5p-sdk](https://github.com/h5p/h5p-sdk), and link it to this project.
+
+```bash
+ cd ..
+ git clone git@github.com:h5p/h5p-sdk.git
+ cd h5p-sdk
+ npm link
+ cd ../h5p-hub-client
+ npm link h5p-sdk
+```
+
 ## Getting started
 
 Grab all the modules:

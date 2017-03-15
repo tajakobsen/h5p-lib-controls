@@ -1,5 +1,5 @@
-import {attributeEquals, hasAttribute, setAttribute} from '../utils/elements';
-import {compose, forEach, filter, some, curry} from '../utils/functional';
+import {attributeEquals, hasAttribute, setAttribute} from 'utils/elements';
+import {compose, forEach, filter, some, curry} from 'utils/functional';
 
 /**
  * @type {string}
@@ -88,7 +88,6 @@ export default class Drag {
    * @param {HTMLElement} element
    */
   select({element}) {
-    console.log('Drag on select');
     const alreadyGrabbed = isGrabbed(element);
 
     this.setAllGrabbedToFalse();

@@ -1060,7 +1060,6 @@
 	    value: function select(_ref) {
 	      var element = _ref.element;
 	
-	      console.log('Drag on select');
 	      var alreadyGrabbed = isGrabbed(element);
 	
 	      this.setAllGrabbedToFalse();

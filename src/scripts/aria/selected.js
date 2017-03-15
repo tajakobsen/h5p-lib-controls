@@ -1,4 +1,4 @@
-import {setAttribute, removeAttribute, attributeEquals} from '../utils/elements';
+import {setAttribute, removeAttribute, attributeEquals} from 'utils/elements';
 
 export default class Choice {
   constructor(){
